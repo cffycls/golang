@@ -1,6 +1,8 @@
-#go
+go
+====
 
-####8、go module命令  
+8、go module命令 
+---- 
 ```
 go mod init golang[任意：项目名称]  
 ————初始化，生go.mod文件[类库引用记录]  
