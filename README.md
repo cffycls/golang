@@ -28,3 +28,9 @@ go mod edit -fmt 格式化
 
 go get/ go build也会添加依赖
 ```
+git顶级目录更新忽略
+```
+git rm -r --cached .
+git add .
+git commit -m 'update .gitignore'
+```
