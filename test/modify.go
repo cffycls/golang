@@ -13,22 +13,27 @@ import (
 )
 
 /**
-	ts浏览器视频缓存文件合并
+ * 安卓小视屏播放器
+ * ts 浏览器视频缓存：文件内容提取、处理，文件拷贝，按指定序列排序，AES解密
  */
 func main()  {
 	scanDir := "./"
-	scanDir = "/home/cffycls/Desktop/vd/"
 
+	//、知识点1. 文件操作
+	/**
+	 * os.Open || OP.Readdir || OP.Stat 等
+	 */
 	dstP,_ := os.Open(scanDir)
 	defer dstP.Close()
 	dir,_ := dstP.Readdir(0)     //获取文件夹下各个文件或文件夹的列表
 	for _,fileInfo := range dir{
-		dstF,_ := os.Open(scanDir+"/"+fileInfo.Name())
+		fmt.Print(scanDir+fileInfo.Name())
+		dstF,_ := os.Open(scanDir+fileInfo.Name())
 		info,_ := dstF.Stat()
 		fmt.Println(fileInfo.Name())
 		if info.IsDir() && !strings.HasSuffix(fileInfo.Name(), "_new") {
-			os.Mkdir(scanDir+"/"+fileInfo.Name()+"_new", os.ModePerm)
-			copyFile(scanDir+"/"+fileInfo.Name()+"/", scanDir+"/"+fileInfo.Name()+"_new/")
+			os.Mkdir(scanDir+fileInfo.Name()+"_new", os.ModePerm)
+			copyFile(scanDir+fileInfo.Name()+"/", scanDir+fileInfo.Name()+"_new/", fileInfo.Name())
 		}
 	}
 }
@@ -44,11 +49,14 @@ func deAes(data, key []byte) []byte {
 	blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])
 	origData := make([]byte, len(data))
 	blockMode.CryptBlocks(origData, data)
+	if len(origData)<1 {
+		return origData
+	}
 	origData = origData[:(len(origData) - int(origData[len(origData)-1]))]
 	return origData
 }
 
-func copyFile(scanDir, dstFile string)  {
+func copyFile(scanDir, dstFile, baseName string)  {
 	file, err := os.Open(scanDir + "index.m3u8")
 	if err != nil {
 		fmt.Println("read err", err.Error())
@@ -62,6 +70,7 @@ func copyFile(scanDir, dstFile string)  {
 	var privateMethod map[string]string
 	privateMethod = make(map[string]string)
 	for {
+		//知识点2. r.ReadLine等 文件内容提取、处理
 		data,_,err := r.ReadLine()
 		if err == io.EOF {
 			break
@@ -78,19 +87,20 @@ func copyFile(scanDir, dstFile string)  {
 		//data, _ := r.ReadBytes('\n')
 		if strings.HasPrefix(s, "/storage") {
 			sn := strings.Split(s, "/")
-			ff := sn[len(sn)-1]
+			ff := sn[len(sn)-1] //ff[0:10]
 			if len(privateMethod) == 0 {
 				src,_ := os.Open(scanDir + ff)
 				defer src.Close()
-				dst,_ := os.OpenFile(dstFile + strconv.Itoa(fileNum)+"__"+ ff[0:10] + ".ts", os.O_WRONLY|os.O_CREATE, 0644)
+				dst,_ := os.OpenFile(dstFile + baseName + "_" + strconv.Itoa(fileNum)+ ".ts", os.O_WRONLY|os.O_CREATE, 0644)
 				defer dst.Close()
 				w,_ := io.Copy(dst, src)
 				wt += int(w)
 			}else{
 				data,_ := ioutil.ReadFile(scanDir + ff)
-				dst,_ := os.OpenFile(dstFile + strconv.Itoa(fileNum)+"__"+ ff[0:10] + ".ts", os.O_WRONLY|os.O_CREATE, 0644)
+				dst,_ := os.OpenFile(dstFile + baseName + "_" + strconv.Itoa(fileNum)+ ".ts", os.O_WRONLY|os.O_CREATE, 0644)
 				defer dst.Close()
 
+				//知识点3. []byte 字符串切片参数data
 				data = deAes(data, []byte(privateMethod["KEY"]))
 				w,_ := dst.Write(data)
 				wt += int(w)
