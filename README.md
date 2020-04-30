@@ -22,24 +22,24 @@ b.关联 map
     mMap[11] = "cat"
     mMap[12] = "mouse"
     //delete(mMap,1)无有无效、 delete(mMap,11) 
-	nMap := new(map[int] string)
+    nMap := new(map[int] string)
 ```
 c.结构体 struct
 ```cgo
 type Animal struct {
-	Color string
+    Color string  //大写开头公有
 }
 
 //定义dog结构体
 type Dog struct {
-	Animal
-	Id int
-	Name string
-	Age int
+    Animal
+    Id int
+    Name string
+    Age int
 }
 func (a *Animal)Eat() string {
-	fmt.Println("Animal is Eatting")
-	return "Eat yummy yummy!!"
+    fmt.Println("Animal is Eatting")
+    return "Eat yummy yummy!!"
 }
 ```
 d.通道 chan[nel]
@@ -47,27 +47,27 @@ d.通道 chan[nel]
     mChan := make(chan int,3) //缓存数3
     mChan <- 336
     //...
-	close(mChan)
+    close(mChan)
 ```
 错误捕捉
 ```cgo
 func receivePanic()  {
-	fmt.Print("panic + recover异常处理: ")
-	defer recoverPanic()
-	//panic(errors.New("I am a panic"))  //优先级最高
-	//panic("I am a panic")  //优先级高
-	panic(1)
+    fmt.Print("panic + recover异常处理: ")
+    defer recoverPanic()
+    //panic(errors.New("I am a panic"))  //优先级最高
+    //panic("I am a panic")  //优先级高
+    panic(1)
 }
 func recoverPanic()  {
-	massage := recover()
-	switch massage.(type) {
-	case error:
-		fmt.Println("error: ", massage)
-	case string:
-		fmt.Println("string: ", massage)
-	default:
-		fmt.Println("unknown: ", massage)
-	}
+    massage := recover()
+    switch massage.(type) {
+    case error:
+        fmt.Println("error: ", massage)
+    case string:
+        fmt.Println("string: ", massage)
+    default:
+        fmt.Println("unknown: ", massage)
+    }
 }
 ```
 
@@ -92,8 +92,8 @@ b.其它包引用
 go get github.com/go-redis/redis 
 
 import (
-	"fmt"
-	"github.com/go-redis/redis/v7"
+    "fmt"
+    "github.com/go-redis/redis/v7"
 )
 ```
 命令参见 go help mod
@@ -103,23 +103,25 @@ import (
 a.mysql操作
 ```cgo
     "database/sql"
-	_"github.com/go-sql-driver/mysql"
+    _"github.com/go-sql-driver/mysql"
 
 type User struct {
-	id 				int			`db:"id"`
-	username 		string		`db:"username"`
-	last_login 		string		`db:"last_login"`
+    id                    int                   `db:"id"`
+    username              string                `db:"username"`
+    last_login            string                `db:"last_login"`
 }
-	dsn := "root:123456@tcp(172.1.11.11:3306)/test?charset=utf8"
-	mysqlDB, err := sql.Open("mysql", dsn) //1、连接
+    //1、连接
+    dsn := "root:123456@tcp(172.1.11.11:3306)/test?charset=utf8"
+    mysqlDB, err := sql.Open("mysql", dsn)
 
-    //执行SQL语句
-	err = mysqlDB.QueryRow("select count(id) from user").Scan(&sum) //2、num查询行数
-
+    //2、执行SQL语句，num查询行数
+    err = mysqlDB.QueryRow("select count(id) from user").Scan(&sum) 
+    //3、绑定参数并执行
     stmt, err := mysqlDB.Prepare("INSERT INTO user (username,passwd,last_login) VALUES(?,?,?)")
-    _, err := stmt.Exec(username, passwd, last_login) //3、绑定参数并执行
+    _, err := stmt.Exec(username, passwd, last_login) 
+    rows, _ := mysqlDB.Query(`SELECT * FROM user ORDER BY id ASC`)  
 
-    rows, _ := mysqlDB.Query(`SELECT * FROM user ORDER BY id ASC`) //4、查询多行，并逐行追加到结构体
+    //4、处理查询结果，逐行追加到结构体
     users := []User{}
     for rows.Next() {
         err := rows.Scan(&id, &username, &passwd, &last_login)
@@ -131,24 +133,24 @@ type User struct {
 ```
 b.redis操作
 ```cgo
-	"github.com/go-redis/redis"
+    "github.com/go-redis/redis"
 
     //1、连接：单机、集群
     client := redis.NewClient(&redis.Options{
-		Addr:     addr,
-	})
-	redisCsDB = redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs: addr,
-	})
-	pong, err := redisCsDB.Ping().Result() //网络测试
-	l,_ := time.LoadLocation("Asia/Shanghai")
+        Addr:     addr,
+    })
+    redisCsDB = redis.NewClusterClient(&redis.ClusterOptions{
+        Addrs: addr,
+    })
+    pong, err := redisCsDB.Ping().Result() //网络测试
+    l,_ := time.LoadLocation("Asia/Shanghai")
     //2、获取数据吧
-	val, err := redisCsDB.Get("set-10").Result()
+    val, err := redisCsDB.Get("set-10").Result()
 ```
 c.curl
 ```cgo
-	"io/ioutil"
-	"net/http"
+    "io/ioutil"
+    "net/http"
 
     func curlLength (url string) string {
         //1. 建立 http.Client 客户端对象

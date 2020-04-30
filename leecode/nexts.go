@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 /**
@@ -38,48 +38,48 @@ import (
 0 <= relation[i][0],relation[i][1] < n 且 relation[i][0] != relation[i][1]
  */
 func numWays(n int, relation [][]int, k int) int {
-	fmt.Println(relation)
-	//n = 5, relation = [[0,2],[2,1],[3,4],[2,3],[1,4],[2,0],[0,4]], k = 3
-	//  0->2->0->4， 0->2->1->4， 0->2->3->4
-	var mm map[string]*Node
-	mm = make(map[string]*Node)
-	head := &Node{
-		Val:  nil,
-		Next: nil,
-	}
-	now := head
-	for i,_ := range relation {
-		//k := strconv.Itoa(relation[i][0]) + strconv.Itoa(relation[i][1])
-		if relation[i][0]==0 {
-			head.Next = append(head.Next, &Node{
-				Val:  relation[i],
-				Next: nil,
-			})
-		} else {
-			
-		}
-		now = now.Next[0]
-	}
+    fmt.Println(relation)
+    //n = 5, relation = [[0,2],[2,1],[3,4],[2,3],[1,4],[2,0],[0,4]], k = 3
+    //  0->2->0->4， 0->2->1->4， 0->2->3->4
+    var mm map[string]*Node
+    mm = make(map[string]*Node)
+    head := &Node{
+        Val:  nil,
+        Next: nil,
+    }
+    now := head
+    for i,_ := range relation {
+        //k := strconv.Itoa(relation[i][0]) + strconv.Itoa(relation[i][1])
+        if relation[i][0]==0 {
+            head.Next = append(head.Next, &Node{
+                Val:  relation[i],
+                Next: nil,
+            })
+        } else {
 
-	fmt.Println(mm)
-	return len(mm)
+        }
+        now = now.Next[0]
+    }
+
+    fmt.Println(mm)
+    return len(mm)
 
 }
 
 type Node struct {
-	Val []int
-	Next []*Node
+    Val []int
+    Next []*Node
 }
 
 func main()  {
-	c := [][]int{
-		{0,2},
-		{2,1},
-		{3,4},
-		{2,3},
-		{1,4},
-		{2,0},
-		{0,4},
-	}
-	fmt.Println( numWays(5, c ,3))
+    c := [][]int{
+        {0,2},
+        {2,1},
+        {3,4},
+        {2,3},
+        {1,4},
+        {2,0},
+        {0,4},
+    }
+    fmt.Println( numWays(5, c ,3))
 }
