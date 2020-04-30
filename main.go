@@ -1,13 +1,14 @@
 package main
 
 import (
-	"./demo_interface"
-	"./demo_json"
-	"./demo_struct" //GOPATH ?? GOROOT /src/demo_struct 都可以运行，后者为编辑器所接受。或直接使用相对路径
-	"./demo_sugar"
 	"fmt"
+	"main/demo_interface"
+	"main/demo_json"
+	"main/demo_struct" //current/package ?? GOROOT /src/demo_struct 都可以运行，后者为编辑器所接受。或直接使用相对路径
+	"main/demo_sugar"
 	"reflect"
 )
+
 
 func main()  {
 	//1.
@@ -145,7 +146,7 @@ func newMap()  {
 	panic + recover异常处理
  */
 func receivePanic()  {
-	fmt.Print("anic + recover异常处理: ")
+	fmt.Print("panic + recover异常处理: ")
 	defer recoverPanic()
 	//panic(errors.New("I am a panic"))  //优先级最高
 	//panic("I am a panic")  //优先级高
